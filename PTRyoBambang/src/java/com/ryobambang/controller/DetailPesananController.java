@@ -36,13 +36,47 @@ public class DetailPesananController extends HttpServlet {
 
         try (Connection conn = new com.ryobambang.model.Koneksi().getConnection()) {
 
-            String sql = "SELECT p.id_pesanan, p.tanggal, p.total, u.username, " +
-                         "d.id_produk, pr.nama_produk, d.jumlah, pr.harga " +
-                         "FROM idpesanan p " +
-                         "JOIN iddetail_pesanan d ON p.id_pesanan = d.id_pesanan " +
-                         "JOIN idproduk pr ON d.id_produk = pr.id_produk " +
-                         "JOIN iduser u ON p.id_user = u.id_user " +
-                         "ORDER BY p.id_pesanan DESC";
+            // Jika tombol BAYAR ditekan
+            String metodePembayaran = request.getParameter("metode_pembayaran");
+            String alamat = request.getParameter("alamat");
+            String grandTotalStr = request.getParameter("grand_total");
+
+            if (metodePembayaran != null && alamat != null && grandTotalStr != null) {
+                HttpSession session = request.getSession(false);
+                com.ryobambang.model.iduser userObj = (com.ryobambang.model.iduser) session.getAttribute("id_user");
+                int idUser = userObj.getId_user();
+
+                // Insert ke idbayar per produk (harga per baris)
+                String insertBayar = "INSERT INTO idbayar (id_pesanan, id_user, id_produk, tanggal, produk, jumlah_beli, total, metode_pembayaran, alamat) "
+                        + "SELECT p.id_pesanan, p.id_user, d.id_produk, p.tanggal, pr.nama_produk, d.jumlah, pr.harga, ?, ? "
+                        + "FROM idpesanan p "
+                        + "JOIN iddetail_pesanan d ON p.id_pesanan = d.id_pesanan "
+                        + "JOIN idproduk pr ON d.id_produk = pr.id_produk "
+                        + "WHERE p.id_user = ?";
+                PreparedStatement psBayar = conn.prepareStatement(insertBayar);
+                psBayar.setString(1, metodePembayaran);
+                psBayar.setString(2, alamat);
+                psBayar.setInt(3, idUser);
+                psBayar.executeUpdate();
+                psBayar.close();
+
+                // Hapus pesanan setelah dibayar
+                PreparedStatement psDeleteDetail = conn.prepareStatement("DELETE FROM iddetail_pesanan WHERE id_pesanan IN (SELECT id_pesanan FROM idpesanan WHERE id_user = ?)");
+                psDeleteDetail.setInt(1, idUser);
+                psDeleteDetail.executeUpdate();
+                psDeleteDetail.close();
+
+                konten += "<p style='color:green;'>Pembayaran berhasil! Data tersimpan dan pesanan dihapus.</p>";
+            }
+
+            // Tampilkan detail pesanan
+            String sql = "SELECT p.id_pesanan, p.tanggal, p.total, u.username, "
+                    + "d.id_produk, pr.nama_produk, d.jumlah, pr.harga "
+                    + "FROM idpesanan p "
+                    + "JOIN iddetail_pesanan d ON p.id_pesanan = d.id_pesanan "
+                    + "JOIN idproduk pr ON d.id_produk = pr.id_produk "
+                    + "JOIN iduser u ON p.id_user = u.id_user "
+                    + "ORDER BY p.id_pesanan DESC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -50,7 +84,7 @@ public class DetailPesananController extends HttpServlet {
             konten += "<table border='1' cellpadding='8' cellspacing='0' style='width:100%; font-size:16px;'>";
             konten += "<tr><th>ID Pesanan</th><th>User</th><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Harga</th></tr>";
 
-            double grandTotal = 0; // untuk akumulasi semua pesanan
+            double grandTotal = 0;
 
             if (!rs.isBeforeFirst()) {
                 konten += "<tr><td colspan='6' style='text-align:center; color:blue; font-size:18px;'>Belum Ada Pesanan Nih, Belanja Yuk 😊</td></tr>";
@@ -58,16 +92,13 @@ public class DetailPesananController extends HttpServlet {
                 while (rs.next()) {
                     int idPesanan = rs.getInt("id_pesanan");
                     String tanggal = rs.getString("tanggal");
-                    double total = rs.getDouble("total"); // total per pesanan
+                    double harga = rs.getDouble("harga");
                     String username = rs.getString("username");
                     String namaProduk = rs.getString("nama_produk");
                     int jumlah = rs.getInt("jumlah");
-                    double harga = rs.getDouble("harga");
 
                     String hargaFormatted = "Rp " + formatRupiah.format(harga);
-
-                    // akumulasi grand total
-                    grandTotal += total;
+                    grandTotal += harga * jumlah;
 
                     konten += "<tr>"
                             + "<td>" + idPesanan + "</td>"
@@ -79,15 +110,27 @@ public class DetailPesananController extends HttpServlet {
                             + "</tr>";
                 }
 
-                // baris total semua pesanan
-                konten += "<tr><td colspan='6' style='text-align:right; font-weight:bold;'>TOTAL SEMUA PESANAN: Rp " 
+                // Baris total semua pesanan
+                konten += "<tr><td colspan='6' style='text-align:right; font-weight:bold;'>TOTAL SEMUA PESANAN: Rp "
                         + formatRupiah.format(grandTotal) + "</td></tr>";
 
-                // tombol BAYAR untuk semua pesanan
-                konten += "<tr><td colspan='6' style='text-align:center;'>"
-                        + "<form method='post' action='BayarController'>"
+                // Form pembayaran & pengiriman
+                konten += "<tr><td colspan='6'>"
+                        + "<form method='post' action='DetailPesananController'>"
                         + "<input type='hidden' name='grand_total' value='" + grandTotal + "'>"
-                        + "<input type='submit' value='BAYAR' style='background-color:green; color:white; padding:8px 15px;'>"
+
+                        + "<label>Metode Pembayaran:</label><br>"
+                        + "<select name='metode_pembayaran' required>"
+                        + "<option value='Transfer Bank'>Transfer Bank</option>"
+                        + "<option value='E-Wallet'>E-Wallet</option>"
+                        + "<option value='COD'>Cash on Delivery</option>"
+                        + "</select><br><br>"
+
+                        + "<label>Alamat Lengkap:</label><br>"
+                        + "<textarea name='alamat' rows='3' cols='50' required></textarea><br><br>"
+
+                        + "<input type='submit' value='BAYAR' "
+                        + "style='background-color:green; color:white; padding:8px 15px; font-weight:bold;'>"
                         + "</form>"
                         + "</td></tr>";
             }
