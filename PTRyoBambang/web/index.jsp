@@ -23,14 +23,10 @@
                 <li><a href="index.jsp">Home</a></li>
                 <%
                     com.ryobambang.model.iduser u = (com.ryobambang.model.iduser)session.getAttribute("id_user");
-                    if (u == null) {
-                %>
-                <%
-                    } else {
+                    if (u != null) {
                 %>
                     <!-- Sudah login -->
                     <li><a href="ProdukController">Produk</a></li>
-                    <li><a href="PesananController">Pesanan</a></li>
                     <li><a href="DetailPesananController">Detail Pesanan</a></li>
                     <li><a href="LogoutController">Logout</a></li>
                 <%
@@ -42,10 +38,10 @@
 
     <div class="container">
         <main class="content">
-            <h2>Selamat Datang</h2>
             <%
                 if (u == null) {
             %>
+                <h2>Selamat Datang</h2>
                 <p>Silakan login untuk mulai berbelanja.</p>
                 <form action="LoginController" method="post">
                     <label>Username:</label>
@@ -64,7 +60,9 @@
             <%
                 } else {
             %>
+                <h2>Selamat Datang</h2>
                 <p>Halo, <b><%=u.getUsername()%></b>! Senang melihatmu kembali.</p>
+                <p>Silakan pilih menu di atas untuk mulai berbelanja atau melihat pesanan.</p>
             <%
                 }
             %>

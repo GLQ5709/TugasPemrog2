@@ -29,68 +29,58 @@ public class MainForm extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    public void tampilkan(String konten, HttpServletRequest request, HttpServletResponse response) 
+    public void tampilkan(String konten, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        HttpSession session = request.getSession(false); // jangan buat session baru
-        if (session == null || session.getAttribute("user") == null) {
-            // belum login → balik ke index.jsp
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id_user") == null) {
             response.sendRedirect("index.jsp");
             return;
         }
 
-        // kalau sudah login, ambil user dari session
         com.ryobambang.model.iduser u = (com.ryobambang.model.iduser) session.getAttribute("id_user");
         String userName = u.getUsername();
-
-        // menu samping
-        String menu = "<br><b>Master Data</b><br>"
-                + "<a href=ProdukController>Produk</a><br>"
-                + "<b>Transaksi</b><br>"
-                + "<a href=PesananController>Pesanan</a><br><br>"
-                + "<b>Laporan</b><br>"
-                + "<a href=DetailPesananController>Detail Pesanan</a><br><br>"
-                + "<a href=LogoutController>Logout</a><br><br>";
-
-        // top menu
-        String topMenu = "<nav><ul>"
-                + "<li><a href=MainForm>Home</a></li>"
-                + "<li><a href=ProdukController>Produk</a></li>"
-                + "<li><a href=PesananController>Pesanan</a></li>"
-                + "<li><a href=DetailPesananController>Detail Pesanan</a></li>"
-                + "<li><a href=LogoutController>Logout</a></li>"
-                + "</ul></nav>";
-
-        konten += "<h2>Halo, " + userName + "</h2>";
 
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<link href='style.css' rel='stylesheet' type='text/css' />");
-            out.println("<title>MainForm - PT RyoBambang</title>");
+            out.println("<meta charset='UTF-8'>");
+            out.println("<link rel='stylesheet' type='text/css' href='" + request.getContextPath() + "/style.css'>");
+            out.println("<title>PT. RyoBambang</title>");
             out.println("</head>");
-            out.println("<body bgcolor=\"#808080\">");
-            out.println("<center>");
-            out.println("<table width=\"80%\" bgcolor=\"#eeeeee\"> ");
-            out.println("<tr><td colspan=\"2\" align=\"center\">");
-            out.println("<h2>PT RyoBambang</h2>");
-            out.println("<h4>Toko Baju Online</h4>");
-            out.println("</td></tr>");
-            out.println("<tr height=\"400\">");
-            out.println("<td width=\"200\" align=\"center\" valign=\"top\" bgcolor=\"#eeffee\">");
-            out.println("<div id='menu'>" + menu + "</div>");
-            out.println("</td>");
-            out.println("<td align=\"center\" valign=\"top\" bgcolor=\"#ffffff\">");
-            out.println(topMenu);
+            out.println("<body>");
+
+            // header
+            out.println("<header>");
+            out.println("<div class='logo'>");
+            out.println("<h1>PT. RyoBambang</h1>");
+            out.println("<p>Toko Baju Online</p>");
+            out.println("</div>");
+            out.println("<nav>");
+            out.println("<ul>");
+            out.println("<li><a href='index.jsp'>Home</a></li>");
+            out.println("<li><a href='ProdukController'>Produk</a></li>");
+            out.println("<li><a href='DetailPesananController'>Detail Pesanan</a></li>");
+            out.println("<li><a href='LogoutController'>Logout</a></li>");
+            out.println("</ul>");
+            out.println("</nav>");
+            out.println("</header>");
+
+            // main content
+            out.println("<div class='container'>");
+            out.println("<main class='content'>");
+            out.println("<h2>Halo, " + userName + "</h2>");
             out.println("<br>" + konten);
-            out.println("</td></tr>");
-            out.println("<tr><td colspan=\"2\" align=\"center\" bgcolor=\"#eeeef\">");
-            out.println("<small>&copy; 2025 PT RyoBambang</small>");
-            out.println("</td></tr>");
-            out.println("</table>");
-            out.println("</center>");
+            out.println("</main>");
+            out.println("</div>");
+
+            // footer
+            out.println("<footer>");
+            out.println("<p>&copy; 2025 PT. RyoBambang | Toko Baju Online</p>");
+            out.println("</footer>");
+
             out.println("</body>");
             out.println("</html>");
         }
@@ -99,6 +89,12 @@ public class MainForm extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        tampilkan("", request, response);
+        String konten = (String) request.getAttribute("konten");
+
+        if (konten == null) {
+            konten = "<p>Selamat Datang di PT RyoBambang</p>";
+        }
+
+        tampilkan(konten, request, response);
     }
 }

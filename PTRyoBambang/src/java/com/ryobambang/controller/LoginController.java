@@ -62,7 +62,7 @@ public class LoginController extends HttpServlet {
 
                 HttpSession session = request.getSession();
                 session.setAttribute("id_user", user);
-                response.sendRedirect("MainForm"); // masuk ke MainForm setelah login
+                response.sendRedirect("index.jsp");
             } else {
                 response.sendRedirect("index.jsp?error=true");
             }
