@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 05:44 PM
+-- Generation Time: Dec 18, 2025 at 03:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -49,7 +49,10 @@ INSERT INTO `idbayar` (`id_bayar`, `id_pesanan`, `id_user`, `id_produk`, `tangga
 (2, 8, 211011, 1, '2025-12-08', 'Jasa Pengamanan', 1, 200000000.00, 'Transfer Bank', 'Jl. Kesadaran 1'),
 (4, 7, 211011, 1, '2025-12-08', 'Jasa Pengamanan', 1, 100000000.00, 'Transfer Bank', 'Jl. Kesadaran 1'),
 (5, 8, 211011, 1, '2025-12-08', 'Jasa Pengamanan', 1, 100000000.00, 'Transfer Bank', 'Jl. Kesadaran 1'),
-(7, 9, 211011, 1, '2025-12-09', 'Jasa Pengamanan', 5, 100000000.00, 'COD', 'Jl. Kesadaran 1 No. 151');
+(7, 9, 211011, 1, '2025-12-09', 'Jasa Pengamanan', 5, 100000000.00, 'COD', 'Jl. Kesadaran 1 No. 151'),
+(8, 10, 400877, 7, '2025-12-17', 'Jasa Administrasi', 14, 100000000.00, 'Transfer Bank', 'PT. ABC, Jl. Kasablank'),
+(9, 12, 400877, 2, '2025-12-17', 'Jasa Pengemudi', 25, 100000000.00, 'Transfer Bank', 'PT. ABC, Jl. Kasablanka'),
+(10, 11, 400877, 6, '2025-12-17', 'Jasa Sales General', 50, 100000000.00, 'Transfer Bank', 'PT. ABC, Jl. Kasablanka');
 
 -- --------------------------------------------------------
 
@@ -90,7 +93,10 @@ INSERT INTO `idpesanan` (`id_pesanan`, `id_user`, `tanggal`, `total`) VALUES
 (6, 211011, '2025-12-07 17:00:00', 100000000),
 (7, 211011, '2025-12-07 17:00:00', 100000000),
 (8, 211011, '2025-12-07 17:00:00', 100000000),
-(9, 211011, '2025-12-08 17:00:00', 500000000);
+(9, 211011, '2025-12-08 17:00:00', 500000000),
+(10, 400877, '2025-12-16 17:00:00', 1400000000),
+(11, 400877, '2025-12-16 17:00:00', 5000000000),
+(12, 400877, '2025-12-16 17:00:00', 2500000000);
 
 -- --------------------------------------------------------
 
@@ -110,7 +116,16 @@ CREATE TABLE `idproduk` (
 --
 
 INSERT INTO `idproduk` (`id_produk`, `nama_produk`, `harga`, `stok`) VALUES
-(1, 'Jasa Pengamanan', 100000000, 95);
+(1, 'Jasa Pengamanan', 100000000, 95),
+(2, 'Jasa Pengemudi', 100000000, 75),
+(3, 'Jasa Cleaning Service', 100000000, 100),
+(4, 'Jasa Operator', 100000000, 100),
+(5, 'Jasa Back-Office', 100000000, 100),
+(6, 'Jasa Sales General', 100000000, 50),
+(7, 'Jasa Administrasi', 100000000, 86),
+(8, 'Jasa Customer Service', 100000000, 100),
+(9, 'Jasa Teknisi', 100000000, 100),
+(10, 'Jasa Marketing', 100000000, 100);
 
 -- --------------------------------------------------------
 
@@ -129,7 +144,8 @@ CREATE TABLE `iduser` (
 --
 
 INSERT INTO `iduser` (`id_user`, `username`, `password`) VALUES
-(211011, 'admin', '21232f297a57a5a743894a0e4a801fc3');
+(211011, 'admin', '21232f297a57a5a743894a0e4a801fc3'),
+(400877, 'istrasi', '8a018eab96a8be7d003810675e24110a');
 
 --
 -- Indexes for dumped tables
@@ -179,31 +195,31 @@ ALTER TABLE `iduser`
 -- AUTO_INCREMENT for table `idbayar`
 --
 ALTER TABLE `idbayar`
-  MODIFY `id_bayar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_bayar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `iddetail_pesanan`
 --
 ALTER TABLE `iddetail_pesanan`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `idpesanan`
 --
 ALTER TABLE `idpesanan`
-  MODIFY `id_pesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_pesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `idproduk`
 --
 ALTER TABLE `idproduk`
-  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `iduser`
 --
 ALTER TABLE `iduser`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211012;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=400878;
 
 --
 -- Constraints for dumped tables
